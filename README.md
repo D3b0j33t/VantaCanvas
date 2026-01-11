@@ -2,7 +2,7 @@
 
 A browser-based gesture drawing experience where you draw shapes in the air using hand gestures via your webcam. Completed drawings inflate into soft, 3D balloon-like objects that float in a shared scene.
 
-> **Disclaimer**: This project was built in about 6 hours, so expect bugs! If you encounter any issues or have suggestions, feel free to open an issue or leave feedback. I'd love to hear what you think! Also, feel free to fork this project and make your own version of it.
+> **Disclaimer**: This project was built in about 1 hours, so expect bugs! If you encounter any issues or have suggestions, feel free to open an issue or leave feedback. I'd love to hear what you think! Also, feel free to fork this project and make your own version of it.
 
 ## Recent Updates
 
@@ -119,7 +119,7 @@ Found a bug? Have an idea? I'd love to hear from you!
 
 ## Credits
 
-Designed by [Janus Tiu](https://www.instagram.com/janustiu/)
+Designed by [Haris Ai](https://www.instagram.com/the_haris_hustle/)
 
 ### Open Source Libraries
 
@@ -139,3 +139,4 @@ Thank you to all the maintainers and contributors of these projects!
 ## License
 
 MIT
+
