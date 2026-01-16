@@ -52,7 +52,7 @@ A browser-based gesture drawing experience where you draw shapes in the air usin
 ```bash
 # Clone the repository
 git clone https://github.com/Ai-Haris/AirCanvas.git
-cd air-canvas
+cd AirCanvas
 
 # Install dependencies
 npm install
@@ -139,5 +139,6 @@ Thank you to all the maintainers and contributors of these projects!
 ## License
 
 MIT
+
 
 
