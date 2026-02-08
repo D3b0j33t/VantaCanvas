@@ -1,21 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net ws:; worker-src 'self' blob:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Haris Ai Canvas - Gesture Drawing</title>
+  <title>Air Canvas - Gesture Drawing</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@300;400;500&display=swap"
+    rel="stylesheet">
   <link rel="preconnect" href="https://cdn.jsdelivr.net">
   <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.binarypb" as="fetch" crossorigin>
-  <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_packed_assets_loader.js" as="script" crossorigin>
-  <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_simd_wasm_bin.js" as="script" crossorigin>
+  <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_packed_assets_loader.js"
+    as="script" crossorigin>
+  <link rel="prefetch" href="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands_solution_simd_wasm_bin.js" as="script"
+    crossorigin>
   <style>
     :root {
-      --primary-color: #e8baFF; /* Light purple */
+      --primary-color: #e8baFF;
+      /* Light purple */
       --primary-glow: rgba(232, 186, 255, 0.5);
-      --ui-bg: rgba(40, 20, 40, 0.8); /* Purple-ish dark bg */
+      --ui-bg: rgba(40, 20, 40, 0.8);
+      /* Purple-ish dark bg */
       --ui-border: rgba(232, 186, 255, 0.3);
     }
 
@@ -25,12 +34,14 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       overflow: hidden;
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #0a050a; /* Dark purple-black */
+      background: #0a050a;
+      /* Dark purple-black */
     }
 
     #app {
@@ -59,14 +70,16 @@
     #camera-preview {
       position: absolute;
       top: 24px;
-      left: 24px; /* Moved from center to top-left initially */
+      left: 24px;
+      /* Moved from center to top-left initially */
       /* Smaller size */
-      width: 240px; 
+      width: 240px;
       height: 180px;
       border-radius: 12px;
       overflow: hidden;
       border: 2px solid var(--ui-border);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px var(--primary-glow); /* Purple glow */
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px var(--primary-glow);
+      /* Purple glow */
       z-index: 10;
       background: #000;
       cursor: grab;
@@ -181,7 +194,7 @@
       pointer-events: none;
     }
 
-    #ui-overlay > * {
+    #ui-overlay>* {
       pointer-events: auto;
     }
 
@@ -198,7 +211,8 @@
     .title-text {
       color: var(--primary-color);
       font-family: 'Cormorant Garamond', serif;
-      font-size: 36px; /* Slightly larger */
+      font-size: 36px;
+      /* Slightly larger */
       font-weight: 500;
       font-style: normal;
       letter-spacing: -0.01em;
@@ -273,13 +287,18 @@
     /* Color palette - Moved to Bottom, Horizontal */
     #color-palette {
       position: absolute;
-      bottom: 24px; /* Move to bottom */
-      left: 50%; /* Center horizontally */
+      bottom: 24px;
+      /* Move to bottom */
+      left: 50%;
+      /* Center horizontally */
       transform: translateX(-50%);
-      right: auto; /* Reset right property */
-      top: auto; /* Reset top property */
+      right: auto;
+      /* Reset right property */
+      top: auto;
+      /* Reset top property */
       display: flex;
-      flex-direction: row; /* Horizontal layout */
+      flex-direction: row;
+      /* Horizontal layout */
       gap: 10px;
       padding: 10px 14px;
       background: var(--ui-bg);
@@ -599,8 +618,15 @@
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
     }
 
     /* Loading overlay */
@@ -635,7 +661,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     .loading-text {
@@ -669,7 +697,8 @@
     @media (max-width: 1024px) {
       .decorative-text {
         font-size: 48px;
-        bottom: 80px; /* Adjusted for color palette */
+        bottom: 80px;
+        /* Adjusted for color palette */
       }
 
       #camera-preview {
@@ -708,7 +737,8 @@
 
       #camera-preview:not(.custom-position) {
         top: 16px;
-        left: 16px; /* Keep top-left on small screens */
+        left: 16px;
+        /* Keep top-left on small screens */
         transform: none;
       }
 
@@ -748,7 +778,8 @@
       }
 
       .gesture-hints {
-        bottom: 80px; /* Move up above color palette */
+        bottom: 80px;
+        /* Move up above color palette */
         left: 16px;
         gap: 6px;
       }
@@ -834,7 +865,8 @@
         padding: 6px 10px;
         gap: 6px;
         border-radius: 24px;
-        flex-wrap: wrap; /* Wrap colors on very small screens if needed */
+        flex-wrap: wrap;
+        /* Wrap colors on very small screens if needed */
         justify-content: center;
       }
 
@@ -931,7 +963,8 @@
         flex-direction: row;
         bottom: 12px;
         left: auto;
-        right: 12px; /* Move hints to right on landscape */
+        right: 12px;
+        /* Move hints to right on landscape */
       }
 
       .gesture-hint span {
@@ -944,6 +977,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="app">
     <div class="content-wrapper">
@@ -959,60 +993,67 @@
       </div>
 
       <div id="ui-overlay">
-      <div class="title-section">
-        <div class="title-text">Haris Ai Canvas</div>
-        <div class="subtitle-text">Designed by <a href="https://www.instagram.com/the_haris_hustle/" target="_blank" rel="noopener noreferrer">Haris AI</a></div>
-      </div>
-
-      <div class="action-buttons">
-        <button class="action-btn" id="clear-all-btn">
-          <span class="icon">🗑️</span>
-          <span class="btn-text">Clear All</span>
-        </button>
-        <button class="action-btn" id="invite-btn">
-          <span class="icon">👥</span>
-          <span class="btn-text">Invite Friend</span>
-        </button>
-      </div>
-
-      <div id="color-palette">
-        <div class="color-swatch active" data-color="#FFB3BA" style="background: #FFB3BA;"></div>
-        <div class="color-swatch" data-color="#FFFFBA" style="background: #FFFFBA;"></div>
-        <div class="color-swatch" data-color="#BAFFC9" style="background: #BAFFC9;"></div>
-        <div class="color-swatch" data-color="#BAE1FF" style="background: #BAE1FF;"></div>
-        <div class="color-swatch" data-color="#E8BAFF" style="background: #E8BAFF;"></div>
-        <div class="color-swatch" data-color="#FFD4A3" style="background: #FFD4A3;"></div>
-        <div class="color-swatch" data-color="#A3FFD4" style="background: #A3FFD4;"></div>
-        <div class="color-swatch" data-color="#D4A3FF" style="background: #D4A3FF;"></div>
-        <div class="color-swatch" data-color="#FFFFFF" style="background: #FFFFFF;"></div>
-        <div class="color-swatch" data-color="#e8baFF" style="background: #e8baFF;"></div>
-      </div>
-
-      <div class="gesture-hints">
-        <div class="gesture-hint">
-          <div class="gesture-icon">☝️</div>
-          <span>Point to draw</span>
+        <div class="title-section">
+          <div class="title-text">Haris Ai Canvas</div>
+          <div class="subtitle-text">Designed by <a href="https://www.instagram.com/the_haris_hustle/" target="_blank"
+              rel="noopener noreferrer">Haris AI</a></div>
         </div>
-        <div class="gesture-hint">
-          <div class="gesture-icon">🤏</div>
-          <span>Pinch to grab</span>
+
+        <div class="action-buttons">
+          <button class="action-btn" id="clear-all-btn">
+            <span class="icon">🗑️</span>
+            <span class="btn-text">Clear All</span>
+          </button>
+          <button class="action-btn" id="undo-btn">
+            <span class="icon">↩️</span>
+            <span class="btn-text">Undo</span>
+          </button>
+          <button class="action-btn" id="invite-btn">
+            <span class="icon">👥</span>
+            <span class="btn-text">Invite Friend</span>
+          </button>
         </div>
-        <div class="gesture-hint">
-          <div class="gesture-icon">🖐️</div>
-          <span>Palm to inflate</span>
+
+        <div id="color-palette">
+          <div class="color-swatch active" data-color="#FFB3BA" style="background: #FFB3BA;"></div>
+          <div class="color-swatch" data-color="#FFDFBA" style="background: #FFDFBA;"></div>
+          <div class="color-swatch" data-color="#FFFFBA" style="background: #FFFFBA;"></div>
+          <div class="color-swatch" data-color="#BAFFC9" style="background: #BAFFC9;"></div>
+          <div class="color-swatch" data-color="#BAE1FF" style="background: #BAE1FF;"></div>
+          <div class="color-swatch" data-color="#E8BAFF" style="background: #E8BAFF;"></div>
+          <div class="color-swatch" data-color="#FFD4A3" style="background: #FFD4A3;"></div>
+          <div class="color-swatch" data-color="#A3FFD4" style="background: #A3FFD4;"></div>
+          <div class="color-swatch" data-color="#D4A3FF" style="background: #D4A3FF;"></div>
+          <div class="color-swatch" data-color="#FFFFFF" style="background: #FFFFFF;"></div>
+          <div class="color-swatch" data-color="#F5F5F7" style="background: #F5F5F7;"></div>
+          <div class="color-swatch" data-color="#A0C4FF" style="background: #A0C4FF;"></div>
         </div>
+
+        <div class="gesture-hints">
+          <div class="gesture-hint">
+            <div class="gesture-icon">☝️</div>
+            <span>Point to draw</span>
+          </div>
+          <div class="gesture-hint">
+            <div class="gesture-icon">🤏</div>
+            <span>Pinch to grab</span>
+          </div>
+          <div class="gesture-hint">
+            <div class="gesture-icon">🖐️</div>
+            <span>Palm to inflate</span>
+          </div>
+        </div>
+
+        <div class="controls-info">
+          <span>SCROLL to zoom</span>
+          <span>DRAG to orbit</span>
+          <span>CLICK object to select</span>
+        </div>
+
+        <div id="status-message"></div>
+
+        <div class="decorative-text">create with your hands</div>
       </div>
-
-      <div class="controls-info">
-        <span>SCROLL to zoom</span>
-        <span>DRAG to orbit</span>
-        <span>CLICK object to select</span>
-      </div>
-
-      <div id="status-message"></div>
-
-      <div class="decorative-text">create with your hands</div>
-    </div>
     </div>
 
     <div class="modal-overlay" id="invite-modal">
@@ -1053,6 +1094,7 @@
     </div>
   </div>
 
-  <script type="module" src="/src/main.ts"></script>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
+
 </html>
