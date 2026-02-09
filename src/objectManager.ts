@@ -1,16 +1,15 @@
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { BalloonObject, Stroke } from '../utils/types';
+import { BalloonObject, Stroke } from './types';
 import { Scene3D } from './scene3D';
 import { BalloonInflator } from './balloonInflator';
-import { SCENE, TIMING } from '../utils/constants';
+import { SCENE, TIMING } from './constants';
 
 export class ObjectManager {
   private scene: Scene3D;
   private inflator: BalloonInflator;
   private objects: BalloonObject[] = [];
   private idCounter = 0;
-  private selectedObject: BalloonObject | null = null;
 
   constructor(scene: Scene3D, canvasWidth: number, canvasHeight: number) {
     this.scene = scene;
@@ -339,7 +338,6 @@ export class ObjectManager {
 
   // Select an object (visual feedback)
   selectObject(obj: BalloonObject): void {
-    this.selectedObject = obj;
     // Brief highlight animation
     gsap.to(obj.mesh.scale, {
       x: obj.scale * 1.15,
@@ -364,42 +362,5 @@ export class ObjectManager {
       duration: 0.3,
       ease: 'elastic.out(1, 0.5)'
     });
-  }
-
-  async undo(): Promise<void> {
-    if (this.objects.length === 0) return;
-
-    const lastObject = this.objects[this.objects.length - 1];
-    await this.removeObject(lastObject, true);
-  }
-
-  public clear() {
-    // Remove all objects
-    while (this.objects.length > 0) {
-      const obj = this.objects.pop();
-      if (obj) {
-        this.scene.remove(obj.mesh);
-      }
-    }
-  }
-
-  public setColor(color: string) {
-    // Set the color for the next created object (or currently selected)
-    // Implementation depends on how color is used.
-    // If we have a selected object, maybe change its color?
-    if (this.selectedObject) {
-      // Update selected object color
-      const materials = Array.isArray(this.selectedObject.mesh.material)
-        ? this.selectedObject.mesh.material
-        : [this.selectedObject.mesh.material];
-
-      materials.forEach((mat: THREE.Material) => {
-        if (mat instanceof THREE.MeshStandardMaterial) {
-          mat.color.set(color);
-          mat.emissive.set(color);
-        }
-      });
-      this.selectedObject.color = color;
-    }
   }
 }

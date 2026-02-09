@@ -38,7 +38,6 @@ export interface GestureState {
   duration: number;      // How long current gesture has been held
   velocity: Point2D;     // Hand movement velocity
   confidence: number;
-  pinchDistance?: number; // Distance between thumb and index
 }
 
 export interface BalloonObject {

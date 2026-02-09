@@ -3,10 +3,32 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="Content-Security-Policy"
-    content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net ws:; worker-src 'self' blob:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Air Canvas - Gesture Drawing</title>
+  <title>VantaCanvas - Augmented Reality</title>
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/favicon.png">
+  <meta name="description"
+    content="Vanta Canvas is an immersive, browser-based gesture drawing experience where your hands become the creative tools. Transform 2D air gestures into 3D art.">
+  <meta name="keywords"
+    content="AR, Augmented Reality, Gesture Drawing, Hand Tracking, MediaPipe, Three.js, WebGL, Vanta Canvas, Debojeet Bhowmick, Creative Coding, Interactive Art">
+  <meta name="author" content="Debojeet Bhowmick">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://vantacanvas.vercel.app/">
+  <meta property="og:title" content="Vanta Canvas - Augmented Reality Gesture Drawing">
+  <meta property="og:description"
+    content="Draw in the air with your hands! An immersive AR experience powered by MediaPipe and Three.js.">
+  <meta property="og:image" content="https://vantacanvas.vercel.app/og-image.jpg">
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://vantacanvas.vercel.app/">
+  <meta property="twitter:title" content="Vanta Canvas - Augmented Reality Gesture Drawing">
+  <meta property="twitter:description"
+    content="Draw in the air with your hands! An immersive AR experience powered by MediaPipe and Three.js.">
+  <meta property="twitter:image" content="https://vantacanvas.vercel.app/og-image.jpg">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -206,6 +228,9 @@
       transform: translateX(-50%);
       z-index: 11;
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .title-text {
@@ -994,107 +1019,102 @@
 
       <div id="ui-overlay">
         <div class="title-section">
-          <div class="title-text">Haris Ai Canvas</div>
-          <div class="subtitle-text">Designed by <a href="https://www.instagram.com/the_haris_hustle/" target="_blank"
-              rel="noopener noreferrer">Haris AI</a></div>
-        </div>
-
-        <div class="action-buttons">
-          <button class="action-btn" id="clear-all-btn">
-            <span class="icon">🗑️</span>
-            <span class="btn-text">Clear All</span>
-          </button>
-          <button class="action-btn" id="undo-btn">
-            <span class="icon">↩️</span>
-            <span class="btn-text">Undo</span>
-          </button>
-          <button class="action-btn" id="invite-btn">
-            <span class="icon">👥</span>
-            <span class="btn-text">Invite Friend</span>
-          </button>
-        </div>
-
-        <div id="color-palette">
-          <div class="color-swatch active" data-color="#FFB3BA" style="background: #FFB3BA;"></div>
-          <div class="color-swatch" data-color="#FFDFBA" style="background: #FFDFBA;"></div>
-          <div class="color-swatch" data-color="#FFFFBA" style="background: #FFFFBA;"></div>
-          <div class="color-swatch" data-color="#BAFFC9" style="background: #BAFFC9;"></div>
-          <div class="color-swatch" data-color="#BAE1FF" style="background: #BAE1FF;"></div>
-          <div class="color-swatch" data-color="#E8BAFF" style="background: #E8BAFF;"></div>
-          <div class="color-swatch" data-color="#FFD4A3" style="background: #FFD4A3;"></div>
-          <div class="color-swatch" data-color="#A3FFD4" style="background: #A3FFD4;"></div>
-          <div class="color-swatch" data-color="#D4A3FF" style="background: #D4A3FF;"></div>
-          <div class="color-swatch" data-color="#FFFFFF" style="background: #FFFFFF;"></div>
-          <div class="color-swatch" data-color="#F5F5F7" style="background: #F5F5F7;"></div>
-          <div class="color-swatch" data-color="#A0C4FF" style="background: #A0C4FF;"></div>
-        </div>
-
-        <div class="gesture-hints">
-          <div class="gesture-hint">
-            <div class="gesture-icon">☝️</div>
-            <span>Point to draw</span>
-          </div>
-          <div class="gesture-hint">
-            <div class="gesture-icon">🤏</div>
-            <span>Pinch to grab</span>
-          </div>
-          <div class="gesture-hint">
-            <div class="gesture-icon">🖐️</div>
-            <span>Palm to inflate</span>
-          </div>
-        </div>
-
-        <div class="controls-info">
-          <span>SCROLL to zoom</span>
-          <span>DRAG to orbit</span>
-          <span>CLICK object to select</span>
-        </div>
-
-        <div id="status-message"></div>
-
-        <div class="decorative-text">create with your hands</div>
-      </div>
-    </div>
-
-    <div class="modal-overlay" id="invite-modal">
-      <div class="modal">
-        <div class="modal-header">
-          <h2 class="modal-title">Invite Friend</h2>
-          <button class="modal-close" id="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <p>Share this room code with a friend to draw together in real-time!</p>
-
-          <div class="room-code-section">
-            <div class="room-code-label">Your Room Code</div>
-            <div class="room-code-display">
-              <div class="room-code" id="room-code">------</div>
-              <button class="copy-btn" id="copy-code-btn" title="Copy to clipboard">📋</button>
-            </div>
-          </div>
-
-          <div class="divider"><span>or join a friend</span></div>
-
-          <div class="join-section">
-            <input type="text" id="join-code-input" placeholder="Enter room code" maxlength="6">
-            <button class="join-btn" id="join-room-btn">Join Room</button>
-          </div>
-
-          <div class="connection-status" id="connection-status">
-            <span class="status-dot" id="status-dot"></span>
-            <span id="status-text">Not connected</span>
-          </div>
+          <h1 class="title-text">Vanta Canvas</h1>
+          <p class="subtitle-text">AR Gesture Drawing by <a href="https://debojeet-bhowmick.netlify.app" target="_blank"
+              rel="noopener noreferrer">Debojeet</a></p>
         </div>
       </div>
-    </div>
 
-    <div id="loading-overlay">
-      <div class="loading-spinner"></div>
-      <div class="loading-text">Initializing hand tracking...</div>
+      <div class="action-buttons">
+        <button class="action-btn" id="clear-all-btn">
+          <span class="icon">🗑️</span>
+          <span class="btn-text">Clear</span>
+        </button>
+        <button class="action-btn" id="invite-btn">
+          <span class="icon">👥</span>
+          <span class="btn-text">Invite Friend</span>
+        </button>
+      </div>
+
+      <div id="color-palette">
+        <div class="color-swatch active" data-color="#FFB3BA" style="background: #FFB3BA;"></div>
+        <div class="color-swatch" data-color="#FFFFBA" style="background: #FFFFBA;"></div>
+        <div class="color-swatch" data-color="#BAFFC9" style="background: #BAFFC9;"></div>
+        <div class="color-swatch" data-color="#BAE1FF" style="background: #BAE1FF;"></div>
+        <div class="color-swatch" data-color="#E8BAFF" style="background: #E8BAFF;"></div>
+        <div class="color-swatch" data-color="#FFD4A3" style="background: #FFD4A3;"></div>
+        <div class="color-swatch" data-color="#A3FFD4" style="background: #A3FFD4;"></div>
+        <div class="color-swatch" data-color="#D4A3FF" style="background: #D4A3FF;"></div>
+        <div class="color-swatch" data-color="#FFFFFF" style="background: #FFFFFF;"></div>
+        <div class="color-swatch" data-color="#e8baFF" style="background: #e8baFF;"></div>
+      </div>
+
+      <div class="gesture-hints">
+        <div class="gesture-hint">
+          <div class="gesture-icon">☝️</div>
+          <span>Point to Draw</span>
+        </div>
+        <div class="gesture-hint">
+          <div class="gesture-icon">🤏</div>
+          <span>Pinch to Grab</span>
+        </div>
+        <div class="gesture-hint">
+          <div class="gesture-icon">🖐️</div>
+          <span>Palm to Inflate</span>
+        </div>
+      </div>
+
+      <div class="controls-info">
+        <span>SCROLL to Zoom</span>
+        <span>DRAG to Orbit</span>
+        <span>CLICK object to select</span>
+      </div>
+
+      <div id="status-message"></div>
+
+      <div class="decorative-text"></div>
     </div>
   </div>
 
-  <script type="module" src="/src/main.tsx"></script>
+  <div class="modal-overlay" id="invite-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title">Invite Friend</h2>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Share this room code with a friend to draw together in real-time!</p>
+
+        <div class="room-code-section">
+          <div class="room-code-label">Your Room Code</div>
+          <div class="room-code-display">
+            <div class="room-code" id="room-code">------</div>
+            <button class="copy-btn" id="copy-code-btn" title="Copy to clipboard">📋</button>
+          </div>
+        </div>
+
+        <div class="divider"><span>or join a friend</span></div>
+
+        <div class="join-section">
+          <input type="text" id="join-code-input" placeholder="Enter room code" maxlength="6">
+          <button class="join-btn" id="join-room-btn">Join Room</button>
+        </div>
+
+        <div class="connection-status" id="connection-status">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-text">Not connected</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Initializing Vanta Canvas...</div>
+  </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
 </body>
 
 </html>

@@ -1,17 +1,10 @@
-// Pastel color palette - Expanded
+// Pastel color palette
 export const COLORS = {
   pink: '#FFB3BA',
-  rose: '#FFDFBA',
   yellow: '#FFFFBA',
   mint: '#BAFFC9',
-  teal: '#BAE1FF',
-  lavender: '#E8BAFF',
-  peach: '#FFD4A3',
-  aqua: '#A3FFD4',
-  lilac: '#D4A3FF',
-  white: '#FFFFFF',
-  warmGray: '#F5F5F7',
-  skyBlue: '#A0C4FF'
+  blue: '#BAE1FF',
+  lavender: '#E8BAFF'
 };
 
 export const COLOR_ARRAY = Object.values(COLORS);
@@ -41,24 +34,9 @@ export const LANDMARKS = {
   PINKY_TIP: 20
 };
 
-// Particle settings
-export const PARTICLES = {
-  COUNT_PER_STROKE: 2,
-  COUNT_EXPLOSION: 40,
-  SPEED_MIN: 1,
-  SPEED_MAX: 4,
-  LIFE_MIN: 0.3,
-  LIFE_MAX: 0.8,
-  SIZE_MIN: 2,
-  SIZE_MAX: 6,
-  GRAVITY: 0.15,
-  DRAG: 0.96
-};
-
-// Gesture detection thresholds - Updated
+// Gesture detection thresholds
 export const GESTURE = {
-  PINCH_THRESHOLD: 60,          // Fallback pixels (if ratio fails)
-  PINCH_RATIO: 0.5,             // Threshold relative to hand size (wrist to index MCP)
+  PINCH_THRESHOLD: 40,          // pixels between thumb and index tip
   PALM_HOLD_TIME: 500,          // ms to hold palm for inflate
   FIST_HOLD_TIME: 1000,         // ms to hold fist for clear
   SWIPE_VELOCITY: 800,          // pixels/second for swipe detection

@@ -1,5 +1,5 @@
-import { HandLandmarks, GestureState } from '../utils/types';
-import { LANDMARKS, VISUAL } from '../utils/constants';
+import { HandLandmarks, GestureState } from './types';
+import { LANDMARKS, VISUAL } from './constants';
 
 // Hand skeleton connections
 const HAND_CONNECTIONS = [

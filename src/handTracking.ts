@@ -1,5 +1,5 @@
 import { Hands, Results } from '@mediapipe/hands';
-import { HandLandmarks, Point2D } from '../utils/types';
+import { HandLandmarks, Point2D } from './types';
 
 export type HandResultsCallback = (landmarks: HandLandmarks | null) => void;
 

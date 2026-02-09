@@ -5,11 +5,10 @@ import { HandVisualizer } from './handVisualizer';
 import { Scene3D } from './scene3D';
 import { ObjectManager } from './objectManager';
 import { Multiplayer, MultiplayerEvent } from './multiplayer';
-import { HandLandmarks, GestureState, Point2D, BalloonObject, Stroke } from '../utils/types';
-import { GESTURE, TIMING, PARTICLES } from '../utils/constants';
-import { ParticleSystem } from './particles';
+import { HandLandmarks, GestureState, BalloonObject, Stroke } from './types';
+import { GESTURE, TIMING } from './constants';
 
-export class AirCanvas {
+class AirCanvas {
   // Core components
   private handTracker: HandTracker;
   private gestureDetector: GestureDetector;
@@ -18,24 +17,23 @@ export class AirCanvas {
   private scene3D: Scene3D;
   private objectManager: ObjectManager;
   private multiplayer: Multiplayer;
-  private particleSystem: ParticleSystem;
 
   // Preview components
   private previewVideo: HTMLVideoElement;
   private previewCanvas: HTMLCanvasElement;
   private previewCtx: CanvasRenderingContext2D;
 
-  // UI Elements
-  private loadingOverlay: HTMLElement | null;
-  private statusMessage: HTMLElement | null;
+  // DOM elements
+  private loadingOverlay: HTMLElement;
+  private statusMessage: HTMLElement;
   private colorSwatches: NodeListOf<HTMLElement>;
 
   // Modal elements
-  private inviteModal: HTMLElement | null;
-  private roomCodeDisplay: HTMLElement | null;
-  private joinCodeInput: HTMLInputElement | null;
-  private statusDot: HTMLElement | null;
-  private statusText: HTMLElement | null;
+  private inviteModal: HTMLElement;
+  private roomCodeDisplay: HTMLElement;
+  private joinCodeInput: HTMLInputElement;
+  private statusDot: HTMLElement;
+  private statusText: HTMLElement;
 
   // State
   private isDrawing = false;
@@ -46,8 +44,7 @@ export class AirCanvas {
   private handDetected = false;
   private lastFrameTime = 0;
   private grabbedObject: BalloonObject | null = null;
-  private lastPinchPosition: Point2D | null = null;
-
+  private lastPinchPosition: { x: number; y: number } | null = null;
 
   // Mouse controls state
   private isDragging = false;
@@ -62,30 +59,7 @@ export class AirCanvas {
   private previewStartLeft = 0;
   private previewStartTop = 0;
 
-  private animationId: number | null = null;
-  private isRunning = false;
-
-  // Bound event handlers
-  private boundResize: () => void;
-  private boundOnMouseDown: (e: MouseEvent) => void;
-  private boundOnMouseMove: (e: MouseEvent) => void;
-  private boundOnMouseUp: () => void;
-  private boundOnWheel: (e: WheelEvent) => void;
-  private boundOnTouchStart: (e: TouchEvent) => void;
-  private boundOnTouchMove: (e: TouchEvent) => void;
-  private boundOnSceneClick: (e: MouseEvent) => void;
-
   constructor() {
-    // Initialize bound handlers
-    this.boundResize = this.resize.bind(this);
-    this.boundOnMouseDown = this.onMouseDown.bind(this);
-    this.boundOnMouseMove = this.onMouseMove.bind(this);
-    this.boundOnMouseUp = this.onMouseUp.bind(this);
-    this.boundOnWheel = this.onWheel.bind(this);
-    this.boundOnTouchStart = this.onTouchStart.bind(this);
-    this.boundOnTouchMove = this.onTouchMove.bind(this);
-    this.boundOnSceneClick = this.onSceneClick.bind(this);
-
     // Get DOM elements
     const videoElement = document.getElementById('webcam') as HTMLVideoElement;
     const sceneCanvas = document.getElementById('scene-canvas') as HTMLCanvasElement;
@@ -93,23 +67,20 @@ export class AirCanvas {
     const handCanvas = document.getElementById('hand-canvas') as HTMLCanvasElement;
 
     // Preview elements
-    // In React version, webcam IS the preview video
-    const previewVideo = document.getElementById('preview-video') as HTMLVideoElement;
-    this.previewVideo = previewVideo || videoElement;
-
+    this.previewVideo = document.getElementById('preview-video') as HTMLVideoElement;
     this.previewCanvas = document.getElementById('preview-canvas') as HTMLCanvasElement;
     this.previewCtx = this.previewCanvas.getContext('2d')!;
 
-    this.loadingOverlay = document.getElementById('loading-overlay');
-    this.statusMessage = document.getElementById('status-message');
+    this.loadingOverlay = document.getElementById('loading-overlay')!;
+    this.statusMessage = document.getElementById('status-message')!;
     this.colorSwatches = document.querySelectorAll('.color-swatch');
 
     // Modal elements
-    this.inviteModal = document.getElementById('invite-modal');
-    this.roomCodeDisplay = document.getElementById('room-code');
+    this.inviteModal = document.getElementById('invite-modal')!;
+    this.roomCodeDisplay = document.getElementById('room-code')!;
     this.joinCodeInput = document.getElementById('join-code-input') as HTMLInputElement;
-    this.statusDot = document.getElementById('status-dot');
-    this.statusText = document.getElementById('status-text');
+    this.statusDot = document.getElementById('status-dot')!;
+    this.statusText = document.getElementById('status-text')!;
 
     // Initialize components
     this.handTracker = new HandTracker(videoElement);
@@ -123,7 +94,6 @@ export class AirCanvas {
       window.innerHeight
     );
     this.multiplayer = new Multiplayer();
-    this.particleSystem = new ParticleSystem(window.innerWidth, window.innerHeight);
 
     // Set initial size
     this.resize();
@@ -135,25 +105,14 @@ export class AirCanvas {
     this.setupMultiplayer();
 
     // Start the application
-    this.isRunning = true;
     this.init();
   }
 
   private setupEventListeners(): void {
-    // Store bound methods for cleanup
-    this.boundResize = this.resize.bind(this);
-    this.boundOnMouseDown = this.onMouseDown.bind(this);
-    this.boundOnMouseMove = this.onMouseMove.bind(this);
-    this.boundOnMouseUp = this.onMouseUp.bind(this);
-    this.boundOnWheel = this.onWheel.bind(this);
-    this.boundOnTouchStart = this.onTouchStart.bind(this);
-    this.boundOnTouchMove = this.onTouchMove.bind(this);
-    this.boundOnSceneClick = this.onSceneClick.bind(this);
-
     // Window resize
-    window.addEventListener('resize', this.boundResize);
+    window.addEventListener('resize', () => this.resize());
 
-    // Color palette clicks (no need for cleanup given DOM structure, but could be improved)
+    // Color palette clicks
     this.colorSwatches.forEach(swatch => {
       swatch.addEventListener('click', () => {
         this.colorSwatches.forEach(s => s.classList.remove('active'));
@@ -165,29 +124,22 @@ export class AirCanvas {
     // Mouse controls for 3D scene
     const sceneCanvas = document.getElementById('scene-canvas')!;
 
-    sceneCanvas.addEventListener('mousedown', this.boundOnMouseDown);
-    sceneCanvas.addEventListener('mousemove', this.boundOnMouseMove);
-    sceneCanvas.addEventListener('mouseup', this.boundOnMouseUp);
-    sceneCanvas.addEventListener('mouseleave', this.boundOnMouseUp);
-    sceneCanvas.addEventListener('wheel', this.boundOnWheel);
+    sceneCanvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
+    sceneCanvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
+    sceneCanvas.addEventListener('mouseup', () => this.onMouseUp());
+    sceneCanvas.addEventListener('mouseleave', () => this.onMouseUp());
+    sceneCanvas.addEventListener('wheel', (e) => this.onWheel(e));
 
     // Touch support
-    sceneCanvas.addEventListener('touchstart', this.boundOnTouchStart);
-    sceneCanvas.addEventListener('touchmove', this.boundOnTouchMove);
-    sceneCanvas.addEventListener('touchend', this.boundOnMouseUp);
+    sceneCanvas.addEventListener('touchstart', (e) => this.onTouchStart(e));
+    sceneCanvas.addEventListener('touchmove', (e) => this.onTouchMove(e));
+    sceneCanvas.addEventListener('touchend', () => this.onMouseUp());
 
     // Click to select objects
-    sceneCanvas.addEventListener('click', this.boundOnSceneClick);
+    sceneCanvas.addEventListener('click', (e) => this.onSceneClick(e));
   }
 
   private setupButtonListeners(): void {
-    // Undo button
-    const undoBtn = document.getElementById('undo-btn');
-    undoBtn?.addEventListener('click', () => {
-      this.objectManager.undo();
-      this.showStatus('Undo', 1000);
-    });
-
     // Clear all button
     const clearAllBtn = document.getElementById('clear-all-btn');
     clearAllBtn?.addEventListener('click', () => {
@@ -345,7 +297,7 @@ export class AirCanvas {
 
   private updatePreviewCanvasSize(): void {
     const cameraPreview = document.getElementById('camera-preview');
-    // const isExpanded = cameraPreview?.classList.contains('expanded');
+    const isExpanded = cameraPreview?.classList.contains('expanded');
 
     // Get computed size of the preview container
     if (cameraPreview) {
@@ -358,21 +310,20 @@ export class AirCanvas {
   private setupMultiplayer(): void {
     // Initialize multiplayer
     this.multiplayer.initialize().then(() => {
-      if (this.roomCodeDisplay) {
-        this.roomCodeDisplay.textContent = this.multiplayer.getRoomCode();
-      }
+      this.roomCodeDisplay.textContent = this.multiplayer.getRoomCode();
     }).catch(err => {
       console.error('Failed to initialize multiplayer:', err);
     });
 
     // Handle status changes
-    this.multiplayer.onStatusChange((status, _message) => {
-      if (this.statusDot) {
-        this.statusDot.className = `status-dot ${status === 'connected' ? 'connected' : status === 'connecting' ? 'connecting' : ''}`;
+    this.multiplayer.onStatusChange((status, message) => {
+      this.statusDot.className = 'status-dot';
+      if (status === 'connected') {
+        this.statusDot.classList.add('connected');
+      } else if (status === 'connecting') {
+        this.statusDot.classList.add('connecting');
       }
-      if (this.statusText) {
-        this.statusText.textContent = status === 'connected' ? 'Connected' : status === 'connecting' ? 'Connecting...' : 'Not connected';
-      }
+      this.statusText.textContent = message;
     });
 
     // Handle multiplayer events
@@ -404,11 +355,11 @@ export class AirCanvas {
   }
 
   private openInviteModal(): void {
-    this.inviteModal?.classList.add('visible');
+    this.inviteModal.classList.add('visible');
   }
 
   private closeInviteModal(): void {
-    this.inviteModal?.classList.remove('visible');
+    this.inviteModal.classList.remove('visible');
   }
 
   private async copyRoomCode(): Promise<void> {
@@ -434,11 +385,9 @@ export class AirCanvas {
   }
 
   private async joinRoom(): Promise<void> {
-    const code = this.joinCodeInput?.value.trim().toUpperCase();
-    if (!code || code.length !== 6) {
-      if (this.statusText) {
-        this.statusText.textContent = 'Please enter a 6-character code';
-      }
+    const code = this.joinCodeInput.value.trim().toUpperCase();
+    if (code.length !== 6) {
+      this.statusText.textContent = 'Please enter a 6-character code';
       return;
     }
 
@@ -446,9 +395,7 @@ export class AirCanvas {
       await this.multiplayer.joinRoom(code);
       this.showStatus('Connected!', 2000);
     } catch {
-      if (this.statusText) {
-        this.statusText.textContent = 'Failed to connect';
-      }
+      this.statusText.textContent = 'Failed to connect';
     }
   }
 
@@ -540,9 +487,7 @@ export class AirCanvas {
       this.setupCameraPreview();
 
       // Hide loading overlay
-      if (this.loadingOverlay) {
-        this.loadingOverlay.classList.add('hidden');
-      }
+      this.loadingOverlay.classList.add('hidden');
 
       // Start animation loop
       this.animate();
@@ -552,40 +497,7 @@ export class AirCanvas {
     }
   }
 
-  public setColor(color: string) {
-    this.currentColor = color; // Assuming currentColor is a property to store the active drawing color
-    if (this.objectManager) {
-      this.objectManager.setColor(color);
-    }
-    if (this.particleSystem) {
-      // Update particle color if needed, or just current drawing color
-    }
-  }
-
-  public undo() {
-    if (this.objectManager) {
-      this.objectManager.undo();
-    }
-  }
-
-  public clear() {
-    if (this.objectManager) {
-      this.objectManager.clear();
-    }
-    if (this.drawingCanvas) {
-      this.drawingCanvas.clearAll();
-    }
-  }
-
-  public inviteFriend(): string {
-    // Return a dummy code for now or hook into multiplayer
-    return this.multiplayer ? this.multiplayer.getRoomCode() : "1234";
-  }
-
   private setupCameraPreview(): void {
-    // If previewVideo IS webcam, we don't need to copy stream.
-    if (this.previewVideo.id === 'webcam') return;
-
     // Get the video stream from the hand tracker and display in preview
     const webcam = document.getElementById('webcam') as HTMLVideoElement;
     if (webcam.srcObject) {
@@ -607,9 +519,6 @@ export class AirCanvas {
     this.handVisualizer.resize(width, height);
     this.scene3D.resize(width, height);
     this.objectManager.updateSize(width, height);
-    if (this.particleSystem) {
-      this.particleSystem.resize(width, height);
-    }
   }
 
   private onHandResults(landmarks: HandLandmarks | null): void {
@@ -619,7 +528,7 @@ export class AirCanvas {
 
     // Show/hide hand detection message
     if (!this.handDetected && wasDetected) {
-      this.showStatus('Show your hand to begin');
+      this.showStatus('');
     } else if (this.handDetected && !wasDetected) {
       this.hideStatus();
     }
@@ -748,14 +657,6 @@ export class AirCanvas {
     } else {
       // Continue stroke
       this.drawingCanvas.addPoint(position);
-
-      // Emit particles while drawing
-      this.particleSystem.emit(
-        position.x,
-        position.y,
-        this.currentColor,
-        PARTICLES.COUNT_PER_STROKE
-      );
     }
 
     // Render immediately for lowest latency (don't wait for animation frame)
@@ -883,9 +784,7 @@ export class AirCanvas {
   }
 
   private animate(): void {
-    if (!this.isRunning) return;
-
-    this.animationId = requestAnimationFrame(() => this.animate());
+    requestAnimationFrame(() => this.animate());
 
     const now = performance.now();
     const deltaTime = this.lastFrameTime > 0 ? (now - this.lastFrameTime) / 1000 : 0.016;
@@ -896,10 +795,6 @@ export class AirCanvas {
 
     // Render 3D scene
     this.scene3D.render();
-
-    // Update and render particles
-    this.particleSystem.update(deltaTime);
-    this.particleSystem.render();
 
     // Render drawing canvas
     this.drawingCanvas.render();
@@ -921,8 +816,6 @@ export class AirCanvas {
   }
 
   private showStatus(message: string, duration?: number): void {
-    if (!this.statusMessage) return;
-
     this.statusMessage.textContent = message;
     this.statusMessage.classList.add('visible');
 
@@ -932,40 +825,11 @@ export class AirCanvas {
   }
 
   private hideStatus(): void {
-    if (this.statusMessage) {
-      this.statusMessage.classList.remove('visible');
-    }
-  }
-  public cleanup(): void {
-    this.isRunning = false;
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-    }
-    this.particleSystem.destroy();
-    this.handTracker.stop();
-    if (this.multiplayer) {
-      this.multiplayer.destroy();
-    }
-
-    // Remove event listeners
-    window.removeEventListener('resize', this.boundResize);
-
-    const sceneCanvas = document.getElementById('scene-canvas');
-    if (sceneCanvas) {
-      sceneCanvas.removeEventListener('mousedown', this.boundOnMouseDown);
-      sceneCanvas.removeEventListener('mousemove', this.boundOnMouseMove);
-      sceneCanvas.removeEventListener('mouseup', this.boundOnMouseUp);
-      sceneCanvas.removeEventListener('mouseleave', this.boundOnMouseUp);
-      sceneCanvas.removeEventListener('wheel', this.boundOnWheel);
-      sceneCanvas.removeEventListener('touchstart', this.boundOnTouchStart);
-      sceneCanvas.removeEventListener('touchmove', this.boundOnTouchMove);
-      sceneCanvas.removeEventListener('touchend', this.boundOnMouseUp);
-      sceneCanvas.removeEventListener('click', this.boundOnSceneClick);
-    }
+    this.statusMessage.classList.remove('visible');
   }
 }
 
 // Start the application when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  // new AirCanvas();
+  new AirCanvas();
 });

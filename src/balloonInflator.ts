@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { Stroke, Point2D } from '../utils/types';
-import { SCENE } from '../utils/constants';
+import { Stroke, Point2D } from './types';
+import { SCENE } from './constants';
 
 export class BalloonInflator {
   private camera: THREE.PerspectiveCamera;
@@ -151,9 +151,8 @@ export class BalloonInflator {
       const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
       if (dist > 0.001) {
-        // Inflate amount based on position with organic variation
-        const vary = 1 + Math.sin(x * 3 + y * 2) * 0.1;
-        const inflateAmount = SCENE.INFLATION_AMOUNT * 0.1 * vary;
+        // Inflate amount based on position
+        const inflateAmount = SCENE.INFLATION_AMOUNT * 0.1;
 
         // Push vertex outward
         inflatedPositions[i * 3] = x + (dx / dist) * inflateAmount;

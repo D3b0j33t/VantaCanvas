@@ -1,5 +1,5 @@
-import { Point2D, Stroke } from '../utils/types';
-import { STROKE, GESTURE } from '../utils/constants';
+import { Point2D, Stroke } from './types';
+import { STROKE, GESTURE } from './constants';
 
 // Jitter filter threshold - ignore movements smaller than this
 const JITTER_THRESHOLD = 3;

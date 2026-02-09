@@ -1,5 +1,5 @@
 import Peer, { DataConnection } from 'peerjs';
-import { Stroke } from '../utils/types';
+import { Stroke } from './types';
 
 export type MultiplayerEvent =
   | { type: 'stroke_start'; stroke: Stroke }

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { SCENE } from '../utils/constants';
+import { SCENE } from './constants';
 
 export class Scene3D {
   private scene: THREE.Scene;
