@@ -731,7 +731,7 @@ class AirCanvas {
     this.drawingCanvas.clearLivePosition();
 
     if (!stroke) {
-      this.showStatus('Draw a larger shape', 1000);
+      this.showStatus('', 0);
       return;
     }
 
