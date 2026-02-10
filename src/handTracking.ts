@@ -65,12 +65,13 @@ export class HandTracker {
     }
   }
 
-  async start(callback: HandResultsCallback): Promise<void> {
+  async start(callback: HandResultsCallback, onStatus?: (msg: string) => void): Promise<void> {
     this.callback = callback;
 
     if (this.isRunning) return;
 
     try {
+      if (onStatus) onStatus('Requesting camera access...');
       // Request camera access - balance between speed and detection quality
       console.log('HandTracker: Requesting user media...');
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -83,6 +84,8 @@ export class HandTracker {
       });
 
       this.videoElement.srcObject = stream;
+      if (onStatus) onStatus('Camera access granted. Starting video...');
+
       console.log('HandTracker: playing video...');
       // Wrap play in a try/catch to handle autoplay policies
       try {
@@ -90,12 +93,23 @@ export class HandTracker {
         console.log('HandTracker: video playing');
       } catch (playError) {
         console.error('HandTracker: Video play failed', playError);
-        // Sometimes play fails but streaming works, or it requires interaction.
-        // We throw to let the caller handle showing a "Tap to start" or similar if needed.
         throw playError;
       }
 
       this.isRunning = true;
+      if (onStatus) onStatus('Video started. Loading AI model (this may take a moment)...');
+
+      // Force a wait for the AI model to actually be ready, with timeout
+      const privacyTimeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('AI Model load timed out. Check connection.')), 20000)
+      );
+
+      await Promise.race([
+        this.hands.initialize(),
+        privacyTimeout
+      ]);
+
+      if (onStatus) onStatus('AI Model loaded. Starting detection...');
 
       // Use direct requestAnimationFrame for lower latency
       const processFrame = async () => {

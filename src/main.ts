@@ -485,7 +485,15 @@ class AirCanvas {
 
       // Start hand tracking
       console.log('AirCanvas: Starting HandTracker...');
-      await this.handTracker.start((landmarks) => this.onHandResults(landmarks));
+      const loadingText = document.querySelector('.loading-text');
+
+      await this.handTracker.start(
+        (landmarks) => this.onHandResults(landmarks),
+        (status) => {
+          if (loadingText) loadingText.textContent = status;
+          console.log('Init Status:', status);
+        }
+      );
       console.log('AirCanvas: HandTracker started');
 
       // Setup camera preview
