@@ -480,6 +480,7 @@ class AirCanvas {
 
   private async init(): Promise<void> {
     try {
+
       // Start hand tracking
       await this.handTracker.start((landmarks) => this.onHandResults(landmarks));
 
@@ -493,7 +494,26 @@ class AirCanvas {
       this.animate();
     } catch (error) {
       console.error('Failed to initialize:', error);
-      this.showStatus('Camera access denied. Please allow camera access and refresh.');
+
+      // Hide loading overlay so error is visible
+      this.loadingOverlay.classList.add('hidden');
+
+      let errorMessage = 'Failed to initialize camera.';
+      if (error instanceof Error) {
+        if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+          errorMessage = 'Camera permission denied. Please allow camera access and refresh.';
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      this.showStatus(errorMessage);
+
+      // Keep status visible indefinitely for errors
+      if (this.statusMessage) {
+        this.statusMessage.style.opacity = '1';
+        this.statusMessage.style.zIndex = '1000'; // Ensure it's on top
+      }
     }
   }
 
