@@ -1,5 +1,5 @@
 import { HandLandmarks, GestureType, GestureState, Point2D } from './types';
-import { LANDMARKS, GESTURE } from './constants';
+import { LANDMARKS } from './constants';
 
 export class GestureDetector {
   private lastLandmarks: HandLandmarks | null = null;
@@ -7,8 +7,7 @@ export class GestureDetector {
   private gestureStartTime: number = 0;
   private currentGesture: GestureType = 'none';
   private previousGesture: GestureType = 'none';
-  private palmHistory: Point2D[] = [];
-  private velocityHistory: Point2D[] = [];
+
 
   detect(landmarks: HandLandmarks | null): GestureState {
     const now = performance.now();
@@ -20,7 +19,7 @@ export class GestureDetector {
     }
 
     const velocity = this.calculateVelocity(landmarks, dt);
-    const detectedGesture = this.detectGestureType(landmarks, velocity);
+    const detectedGesture = this.detectGestureType(landmarks);
 
     if (detectedGesture !== this.currentGesture) {
       this.previousGesture = this.currentGesture;
@@ -33,8 +32,8 @@ export class GestureDetector {
 
     // Yahan pinchDistance bhi return kar rahe hain taake Main file use kar sake
     const pinchDistance = this.distance(
-        landmarks.landmarks[LANDMARKS.THUMB_TIP],
-        landmarks.landmarks[LANDMARKS.INDEX_TIP]
+      landmarks.landmarks[LANDMARKS.THUMB_TIP],
+      landmarks.landmarks[LANDMARKS.INDEX_TIP]
     );
 
     return {
@@ -73,12 +72,12 @@ export class GestureDetector {
     };
   }
 
-  private detectGestureType(landmarks: HandLandmarks, velocity: Point2D): GestureType {
+  private detectGestureType(landmarks: HandLandmarks): GestureType {
     const lm = landmarks.landmarks;
 
     // 1. PINCH CHECK (High Priority) - Threshold increased to 60 for easier grabbing
     const pinchDistance = this.distance(lm[LANDMARKS.THUMB_TIP], lm[LANDMARKS.INDEX_TIP]);
-    
+
     if (pinchDistance < 60) { // <--- INCREASED THRESHOLD (Easier to pinch)
       return 'pinch';
     }
@@ -111,7 +110,7 @@ export class GestureDetector {
   private isFingerExtended(landmarks: HandLandmarks, tipIdx: number, pipIdx: number): boolean {
     const lm = landmarks.landmarks;
     // Simple check: Tip should be higher (lower Y) than Joint
-    return lm[tipIdx].y < lm[pipIdx].y; 
+    return lm[tipIdx].y < lm[pipIdx].y;
   }
 
   private isPointingIndex(landmarks: HandLandmarks): boolean {
@@ -121,7 +120,7 @@ export class GestureDetector {
     const middleClosed = !this.isFingerExtended(landmarks, LANDMARKS.MIDDLE_TIP, LANDMARKS.MIDDLE_PIP);
     const ringClosed = !this.isFingerExtended(landmarks, LANDMARKS.RING_TIP, LANDMARKS.RING_PIP);
     const pinkyClosed = !this.isFingerExtended(landmarks, LANDMARKS.PINKY_TIP, LANDMARKS.PINKY_PIP);
-    
+
     return indexOpen && middleClosed && ringClosed && pinkyClosed;
   }
 
