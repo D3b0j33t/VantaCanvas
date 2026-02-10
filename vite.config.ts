@@ -6,9 +6,9 @@ export default defineConfig(({ command }) => ({
     command === 'serve' ? basicSsl() : []
   ],
   server: {
-    host: true,
-    https: true,
-    port: 5173
+    host: "::",
+    // https: true, // Commented out to fix build type error
+    port: 8080
   },
   build: {
     target: 'esnext'

@@ -72,6 +72,7 @@ export class HandTracker {
 
     try {
       // Request camera access - balance between speed and detection quality
+      console.log('HandTracker: Requesting user media...');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 640 },
@@ -82,7 +83,17 @@ export class HandTracker {
       });
 
       this.videoElement.srcObject = stream;
-      await this.videoElement.play();
+      console.log('HandTracker: playing video...');
+      // Wrap play in a try/catch to handle autoplay policies
+      try {
+        await this.videoElement.play();
+        console.log('HandTracker: video playing');
+      } catch (playError) {
+        console.error('HandTracker: Video play failed', playError);
+        // Sometimes play fails but streaming works, or it requires interaction.
+        // We throw to let the caller handle showing a "Tap to start" or similar if needed.
+        throw playError;
+      }
 
       this.isRunning = true;
 
@@ -91,12 +102,17 @@ export class HandTracker {
         if (!this.isRunning) return;
 
         if (this.videoElement.readyState >= 2) {
-          await this.hands.send({ image: this.videoElement });
+          try {
+            await this.hands.send({ image: this.videoElement });
+          } catch (e) {
+            console.error('Error sending frame to MediaPipe:', e);
+          }
         }
 
         this.animationId = requestAnimationFrame(processFrame);
       };
 
+      console.log('HandTracker: Starting processing loop');
       processFrame();
     } catch (error) {
       console.error('Failed to start hand tracking:', error);

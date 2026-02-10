@@ -22,6 +22,7 @@ class AirCanvas {
   private previewVideo: HTMLVideoElement;
   private previewCanvas: HTMLCanvasElement;
   private previewCtx: CanvasRenderingContext2D;
+  private isAnimating = false;
 
   // DOM elements
   private loadingOverlay: HTMLElement;
@@ -479,18 +480,24 @@ class AirCanvas {
   }
 
   private async init(): Promise<void> {
+    console.log('AirCanvas: Initializing...');
     try {
 
       // Start hand tracking
+      console.log('AirCanvas: Starting HandTracker...');
       await this.handTracker.start((landmarks) => this.onHandResults(landmarks));
+      console.log('AirCanvas: HandTracker started');
 
       // Setup camera preview
       this.setupCameraPreview();
+      console.log('AirCanvas: Camera preview setup');
 
       // Hide loading overlay
       this.loadingOverlay.classList.add('hidden');
+      console.log('AirCanvas: Init complete, overlay hidden');
 
       // Start animation loop
+      this.isAnimating = true;
       this.animate();
     } catch (error) {
       console.error('Failed to initialize:', error);
@@ -804,6 +811,7 @@ class AirCanvas {
   }
 
   private animate(): void {
+    if (!this.isAnimating) return;
     requestAnimationFrame(() => this.animate());
 
     const now = performance.now();
